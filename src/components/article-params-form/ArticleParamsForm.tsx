@@ -1,5 +1,4 @@
-// src/components/article-params-form/ArticleParamsForm.tsx
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import clsx from 'clsx';
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
@@ -15,66 +14,44 @@ import {
 	backgroundColors,
 	contentWidthArr,
 	fontSizeOptions,
+	ArticleStateType,
+	OptionType,
 } from 'src/constants/articleProps';
+import { useOutsideClick } from 'src/hooks/useOutsideClick';
 
 interface ArticleParamsFormProps {
 	isOpen: boolean;
 	onToggle: () => void;
-	onApply: (newSettings: typeof defaultArticleState) => void;
-	onReset: () => void;
+	onChangeState: (newSettings: ArticleStateType) => void;
 }
 
-export const ArticleParamsForm = ({ isOpen, onToggle, onApply, onReset }: ArticleParamsFormProps) => {
-	const [localState, setLocalState] = useState(defaultArticleState);
+export const ArticleParamsForm = ({ isOpen, onToggle, onChangeState }: ArticleParamsFormProps) => {
+	const [localState, setLocalState] = useState<ArticleStateType>(defaultArticleState);
+	const formRef = useRef<HTMLDivElement>(null);
 
-	const handleInputChange = (key: keyof typeof defaultArticleState, value: string) => {
-		const updatedOption =
-			fontFamilyOptions.find(option => option.value === value) ||
-			fontColors.find(option => option.value === value) ||
-			backgroundColors.find(option => option.value === value) ||
-			contentWidthArr.find(option => option.value === value) ||
-			fontSizeOptions.find(option => option.value === value);
+	useOutsideClick(formRef, onToggle);
 
-		if (updatedOption) {
-			setLocalState(prevState => ({
-				...prevState,
-				[key]: updatedOption,
-			}));
-		}
+	const handleOnChange = (field: keyof ArticleStateType) => {
+		return (value: OptionType) => {
+			setLocalState((prevState) => ({ ...prevState, [field]: value }));
+		};
 	};
 
 	const handleReset = () => {
 		setLocalState(defaultArticleState);
-		onReset();
+		onChangeState(defaultArticleState);
 	};
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		onApply(localState);
+		onChangeState(localState);
 	};
-
-	const handleOutsideClick = (event: MouseEvent) => {
-		const panel = document.querySelector(`.${styles.container}`);
-		if (panel && !panel.contains(event.target as Node)) {
-			onToggle();
-		}
-	};
-
-	useEffect(() => {
-		if (isOpen) {
-			document.addEventListener('mousedown', handleOutsideClick);
-		} else {
-			document.removeEventListener('mousedown', handleOutsideClick);
-		}
-		return () => {
-			document.removeEventListener('mousedown', handleOutsideClick);
-		};
-	}, [isOpen]);
 
 	return (
 		<>
 			<ArrowButton isOpen={isOpen} onClick={onToggle} />
 			<aside
+				ref={formRef}
 				className={clsx(styles.container, { [styles.container_open]: isOpen })}
 			>
 				<form className={styles.form} onSubmit={handleSubmit}>
@@ -83,44 +60,33 @@ export const ArticleParamsForm = ({ isOpen, onToggle, onApply, onReset }: Articl
 						title="Шрифт"
 						options={fontFamilyOptions}
 						selected={localState.fontFamilyOption}
-						onChange={(option) =>
-							handleInputChange('fontFamilyOption', option.value)
-						}
+						onChange={handleOnChange('fontFamilyOption')}
 					/>
-
 					<RadioGroup
 						name="fontSize"
 						title="Размер шрифта"
 						options={fontSizeOptions}
 						selected={localState.fontSizeOption}
-						onChange={(option) =>
-							handleInputChange('fontSizeOption', option.value)
-						}
+						onChange={handleOnChange('fontSizeOption')}
 					/>
 					<Select
 						title="Цвет текста"
 						options={fontColors}
 						selected={localState.fontColor}
-						onChange={(option) =>
-							handleInputChange('fontColor', option.value)
-						}
+						onChange={handleOnChange('fontColor')}
 					/>
 					<Separator />
 					<Select
 						title="Цвет фона"
 						options={backgroundColors}
 						selected={localState.backgroundColor}
-						onChange={(option) =>
-							handleInputChange('backgroundColor', option.value)
-						}
+						onChange={handleOnChange('backgroundColor')}
 					/>
 					<Select
 						title="Ширина контента"
 						options={contentWidthArr}
 						selected={localState.contentWidth}
-						onChange={(option) =>
-							handleInputChange('contentWidth', option.value)
-						}
+						onChange={handleOnChange('contentWidth')}
 					/>
 					<div className={styles.bottomContainer}>
 						<Button
