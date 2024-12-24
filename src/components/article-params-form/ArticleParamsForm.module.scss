@@ -12,6 +12,16 @@
 	transform: translate(0);
 }
 
+.title {
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 800;
+	font-size: 31px;
+	line-height: 42.22px;
+	text-align: left;
+	margin-bottom: 50px;
+	text-transform: uppercase;
+}
+
 .form {
 	display: flex;
 	flex-shrink: 0;
@@ -24,6 +34,11 @@
 	background-color: #ffffff;
 	border-right: 1px solid #000000;
 }
+
+.form > *:not(:last-child) {
+	margin-bottom: 50px;
+}
+
 
 .bottomContainer {
 	display: flex;
