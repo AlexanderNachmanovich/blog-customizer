@@ -20,16 +20,15 @@ import {
 import { useOutsideClick } from 'src/hooks/useOutsideClick';
 
 interface ArticleParamsFormProps {
-	isOpen: boolean;
-	onToggle: () => void;
 	onChangeState: (newSettings: ArticleStateType) => void;
 }
 
-export const ArticleParamsForm = ({ isOpen, onToggle, onChangeState }: ArticleParamsFormProps) => {
+export const ArticleParamsForm = ({ onChangeState }: ArticleParamsFormProps) => {
+	const [isOpen, setIsOpen] = useState(false); // Локальное состояние
 	const [localState, setLocalState] = useState<ArticleStateType>(defaultArticleState);
 	const formRef = useRef<HTMLDivElement>(null);
 
-	useOutsideClick(formRef, onToggle);
+	useOutsideClick(formRef, () => setIsOpen(false)); // Закрытие при клике вне формы
 
 	const handleOnChange = (field: keyof ArticleStateType) => {
 		return (value: OptionType) => {
@@ -49,7 +48,7 @@ export const ArticleParamsForm = ({ isOpen, onToggle, onChangeState }: ArticlePa
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={onToggle} />
+			<ArrowButton isOpen={isOpen} onClick={() => setIsOpen((prev) => !prev)} />
 			<aside
 				ref={formRef}
 				className={clsx(styles.container, { [styles.container_open]: isOpen })}

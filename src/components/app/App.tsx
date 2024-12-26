@@ -8,12 +8,7 @@ import { defaultArticleState, ArticleStateType } from 'src/constants/articleProp
 import styles from '../../styles/index.module.scss';
 
 export const App = () => {
-	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const [articleState, setArticleState] = useState<ArticleStateType>(defaultArticleState);
-
-	const toggleSidebar = () => {
-		setIsSidebarOpen((prev) => !prev);
-	};
 
 	return (
 		<main
@@ -28,11 +23,7 @@ export const App = () => {
 				} as CSSProperties
 			}
 		>
-			<ArticleParamsForm
-				isOpen={isSidebarOpen}
-				onToggle={toggleSidebar}
-				onChangeState={setArticleState}
-			/>
+			<ArticleParamsForm onChangeState={setArticleState} />
 			<Article />
 		</main>
 	);
